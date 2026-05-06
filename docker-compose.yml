@@ -9,7 +9,7 @@ services:
       - redis_data:/data
 
   web:
-    image: registry.illuminat3.xyz/multicrosser:latest
+    image: registry.illuminat3.xyz/multisetter:latest
     command: bundle exec puma -C config/puma.rb
     ports:
       - "9999:3000"
