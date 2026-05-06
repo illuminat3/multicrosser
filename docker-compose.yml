@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  web:
+    build: .
+    command: bundle exec puma -C config/puma.rb
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+      - node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - RAILS_ENV=development
+      - REDIS_URL=redis://redis:6379/1
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE:-change_me_in_production}
+    depends_on:
+      - redis
+
+  webpacker:
+    build: .
+    command: bundle exec bin/webpack-dev-server
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+      - node_modules:/app/node_modules
+    ports:
+      - "3035:3035"
+    environment:
+      - RAILS_ENV=development
+      - NODE_ENV=development
+      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
+    depends_on:
+      - web
+
+volumes:
+  redis_data:
+  bundle_cache:
+  node_modules:

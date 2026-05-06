@@ -1,0 +1,10 @@
+.git
+.gitignore
+log/*
+tmp/*
+storage/*
+node_modules
+public/assets
+public/packs
+.env*
+*.md
