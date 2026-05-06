@@ -11,6 +11,10 @@ RUN apt-get update -qq && apt-get install -y \
   curl \
   git \
   libsqlite3-dev \
+  python2.7 \
+  python3 \
+  shared-mime-info \
+  && ln -sf /usr/bin/python2.7 /usr/local/bin/python \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js 18 LTS
@@ -31,17 +35,17 @@ WORKDIR /app
 
 # Install Ruby gems
 COPY Gemfile Gemfile.lock ./
-RUN bundle install --without development test
+RUN bundle install --without development test --full-index
 
 # Install JS dependencies
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install
 
 # Copy application code
 COPY . .
 
 # Precompile assets
-RUN bundle exec rails assets:precompile RAILS_ENV=production SECRET_KEY_BASE=placeholder
+RUN NODE_OPTIONS=--openssl-legacy-provider bundle exec rails assets:precompile RAILS_ENV=production SECRET_KEY_BASE=placeholder
 
 EXPOSE 3000
 
